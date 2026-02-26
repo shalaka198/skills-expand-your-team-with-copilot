@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create difficulty badge (only if difficulty is specified)
     const difficultyBadge = details.difficulty ? `
-      <span class="difficulty-badge difficulty-${escapeHtml(details.difficulty.toLowerCase())}">
+      <span class="difficulty-badge difficulty-${escapeHtml(details.difficulty).toLowerCase()}">
         ${escapeHtml(details.difficulty)}
       </span>
     ` : '';
