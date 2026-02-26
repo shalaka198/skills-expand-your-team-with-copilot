@@ -570,7 +570,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       </div>
       <div class="social-share-buttons">
-        <button class="share-button" data-activity="${name}" data-description="${details.description}" data-schedule="${formattedSchedule}" title="Share this activity">
+        <button class="share-button" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}" title="Share this activity">
           <span class="share-icon">🔗</span>
           <span>Share</span>
         </button>
@@ -830,6 +830,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return text.replace(/<[^>]*>/g, '').substring(0, 500);
   }
 
+  // HTML escape function for data attributes
+  function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Generate share text template
+  function generateShareText(activityName, description, schedule) {
+    return `Check out this activity at Mergington High School: ${activityName}\n\n${description}\n\nSchedule: ${schedule}`;
+  }
+
   // Handle sharing activity
   function handleShare(activityName, description, schedule) {
     // Sanitize inputs
@@ -837,7 +850,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const safeDescription = sanitizeShareText(description);
     const safeSchedule = sanitizeShareText(schedule);
     
-    const shareText = `Check out this activity at Mergington High School: ${safeName}\n\n${safeDescription}\n\nSchedule: ${safeSchedule}`;
+    const shareText = generateShareText(safeName, safeDescription, safeSchedule);
     const shareUrl = window.location.href;
 
     // Check if Web Share API is available (mobile browsers)
@@ -922,13 +935,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update share links
     const shareText = encodeURIComponent(
-      `Check out this activity at Mergington High School: ${activityName}\n\n${description}\n\nSchedule: ${schedule}`
+      generateShareText(activityName, description, schedule)
     );
     const encodedUrl = encodeURIComponent(shareUrl);
 
-    // Twitter/X
+    // Twitter/X - using x.com (twitter.com still redirects but x.com is the official domain)
     const twitterLink = shareModal.querySelector(".twitter-share");
-    twitterLink.href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
+    twitterLink.href = `https://x.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
 
     // Facebook
     const facebookLink = shareModal.querySelector(".facebook-share");
