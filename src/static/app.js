@@ -543,11 +543,17 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     // Create difficulty badge (only if difficulty is specified)
-    const difficultyBadge = details.difficulty ? `
-      <span class="difficulty-badge difficulty-${escapeHtml(details.difficulty).toLowerCase()}">
-        ${escapeHtml(details.difficulty)}
-      </span>
-    ` : '';
+    let difficultyBadge = '';
+    if (details.difficulty) {
+      // Validate difficulty is one of the expected values
+      const validDifficulties = ['Beginner', 'Intermediate', 'Advanced'];
+      const difficulty = validDifficulties.includes(details.difficulty) ? details.difficulty : 'Beginner';
+      difficultyBadge = `
+        <span class="difficulty-badge difficulty-${difficulty.toLowerCase()}">
+          ${escapeHtml(difficulty)}
+        </span>
+      `;
+    }
 
     // Create capacity indicator
     const capacityIndicator = `
