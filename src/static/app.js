@@ -826,8 +826,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sanitize text for sharing to prevent potential issues
   function sanitizeShareText(text) {
     if (typeof text !== 'string') return '';
-    // Remove any potential HTML tags and limit length
-    return text.replace(/<[^>]*>/g, '').substring(0, 500);
+    // Create a temporary div element to use browser's built-in HTML parsing
+    const div = document.createElement('div');
+    div.textContent = text;
+    // Get the text content (this strips all HTML)
+    const sanitized = div.textContent || div.innerText || '';
+    // Limit length and return
+    return sanitized.substring(0, 500);
   }
 
   // HTML escape function for data attributes
