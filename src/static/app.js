@@ -823,16 +823,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
   }
 
+  // Sanitize text for sharing to prevent potential issues
+  function sanitizeShareText(text) {
+    if (typeof text !== 'string') return '';
+    // Remove any potential HTML tags and limit length
+    return text.replace(/<[^>]*>/g, '').substring(0, 500);
+  }
+
   // Handle sharing activity
   function handleShare(activityName, description, schedule) {
-    const shareText = `Check out this activity at Mergington High School: ${activityName}\n\n${description}\n\nSchedule: ${schedule}`;
+    // Sanitize inputs
+    const safeName = sanitizeShareText(activityName);
+    const safeDescription = sanitizeShareText(description);
+    const safeSchedule = sanitizeShareText(schedule);
+    
+    const shareText = `Check out this activity at Mergington High School: ${safeName}\n\n${safeDescription}\n\nSchedule: ${safeSchedule}`;
     const shareUrl = window.location.href;
 
     // Check if Web Share API is available (mobile browsers)
     if (navigator.share) {
       navigator
         .share({
-          title: `${activityName} - Mergington High School`,
+          title: `${safeName} - Mergington High School`,
           text: shareText,
           url: shareUrl,
         })
@@ -844,12 +856,12 @@ document.addEventListener("DOMContentLoaded", () => {
           if (error.name !== "AbortError") {
             console.error("Error sharing:", error);
             // Fallback to showing share options
-            showShareOptions(activityName, description, schedule, shareUrl);
+            showShareOptions(safeName, safeDescription, safeSchedule, shareUrl);
           }
         });
     } else {
       // Fallback for desktop browsers - show share options modal
-      showShareOptions(activityName, description, schedule, shareUrl);
+      showShareOptions(safeName, safeDescription, safeSchedule, shareUrl);
     }
   }
 
@@ -929,19 +941,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // Copy link
     const copyLinkBtn = shareModal.querySelector(".copy-link");
     copyLinkBtn.onclick = () => {
-      navigator.clipboard
-        .writeText(shareUrl)
-        .then(() => {
-          showMessage("Link copied to clipboard!", "success");
-          shareModal.classList.remove("show");
-          setTimeout(() => {
-            shareModal.classList.add("hidden");
-          }, 300);
-        })
-        .catch((err) => {
-          console.error("Failed to copy:", err);
-          showMessage("Failed to copy link", "error");
-        });
+      // Check if clipboard API is available
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(shareUrl)
+          .then(() => {
+            showMessage("Link copied to clipboard!", "success");
+            shareModal.classList.remove("show");
+            setTimeout(() => {
+              shareModal.classList.add("hidden");
+            }, 300);
+          })
+          .catch((err) => {
+            console.error("Failed to copy:", err);
+            showMessage("Failed to copy link", "error");
+          });
+      } else {
+        // Fallback for browsers without clipboard API
+        showMessage("Clipboard not supported. Please copy the URL manually.", "info");
+      }
     };
 
     // Update activity name
